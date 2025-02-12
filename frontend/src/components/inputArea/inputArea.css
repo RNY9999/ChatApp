@@ -1,0 +1,85 @@
+@import url(../../css/color.css);
+
+/* ====================
+# input-area 
+==================== */
+.input-area {
+  width: 100%;
+  display: grid;
+  gap: 2px;
+  /* grid itemを左寄せにする */
+  justify-items: start;
+}
+
+.input-area__label-area {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+.input-area__label {
+  font-size: 12px;
+  color: var(--font-fbfbfb);
+}
+
+.input-area__forgat-password {
+  font-size: 12px;
+  color: var(--link-color);
+}
+
+.input-area__forgat-password:hover {
+  text-decoration: underline;
+}
+
+.input-area__input {
+  width: 100%;
+  padding: 8px 16px;
+  border: 1px solid var(--line-6);
+  border-radius: 4px;
+  background-color: var(--dark-2);
+}
+
+.input-area__input.--have-icon {
+  padding-right: 42px;
+  position: relative;
+}
+
+.input-area__input.--attention {
+  border-color: var(--error-color);
+}
+
+.input-area__input-field {
+  width: 100%;
+  font-size: 14px;
+  color: var(--font-f7f7f7);
+}
+
+.input-area__supporting-text {
+  width: 100%;
+  height: fit-content;
+  min-height: 20px;
+  font-size: 12px;
+  padding: 0 16px;
+  color: var(--font-fbfbfb);
+}
+
+.input-area__supporting-text.--attention {
+  color: var(--error-color);
+}
+
+
+.input-area__password-toggle {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+}
+
+.input-area__icon {
+  width: 100%;
+  height: 100%;
+  color: var(--font-fbfbfb);
+}
