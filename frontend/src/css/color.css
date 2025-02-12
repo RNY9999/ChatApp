@@ -1,0 +1,36 @@
+:root {
+  /* project color */
+  --primary-color: #89D751;
+  /* --primary-color-hover: #98C379; 旧メインカラー*/
+  --primary-color-hover: #89D765;
+
+  /* link color */
+  --link-color: #4493f8;
+
+  /* error color */
+  --error-color: #eda4bc;
+
+  /* font clo */
+  --font-202020: #202020;
+  --font-333   : #333;
+  --font-404040: #404040;
+  --font-fbfbfb: #fbfbfb;
+  --font-f7f7f7: #f7f7f7;
+  --font-f0f0f0: #f0f0f0;
+  --font-b3b3b3: #b3b3b3;
+
+  /* dark mode */
+  --dark-1: #272727;
+  --dark-2: #343434;
+  --dark-3: #414141;
+  --dark-4: #555;
+  --dark-5: #7a7a7a;
+  --dark-6: #888;
+  /* line col */
+  --line-1: #272727;
+  --line-2: #343434;
+  --line-3: #414141;
+  --line-4: #555;
+  --line-5: #7a7a7a;
+  --line-6: #888;
+}

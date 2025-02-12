@@ -1,0 +1,123 @@
+@import url(../../css/color.css);
+
+/* ====================
+# login-page
+==================== */
+.login-page {
+  width: 100%;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  /* background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, .5)), url(../../images/login-bg-2.png); */
+  background-image: url(../../images/login-bg.png);
+  background-color: rgba(0, 0, 0, .8); 
+  background-size: cover;
+}
+
+.login-page__message {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid var(--error-color);
+  border-radius: 4px;
+  /* display: none; */
+  font-size: 14px;
+  color: var(--error-color);
+}
+
+.login-page__message.--hidden {
+  display: none;
+}
+
+/* ====================
+# login-modal
+==================== */
+
+.login-modal {
+  max-width: 380px;
+  width: 100%;
+  display: grid;
+  padding: 32px;
+  gap: 32px;
+  background-color: rgba(50, 50, 50, 0.8);
+  border: 1px solid var(--line-6);
+  border-radius: 4px;
+  backdrop-filter: blur(8px);
+}
+
+.login-modal__title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-modal__icon {
+  width: 24px;
+  height: 24px;
+  color: var(--font-fbfbfb);
+  margin-right: 8px;
+}
+
+.login-modal__title {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--font-fbfbfb);
+}
+
+.login-modal__submit {
+  width: 100%;
+  padding: 8px 16px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--font-333);
+  background-color: var(--primary-color);
+  border-radius: 4px;
+}
+
+.login-modal__submit:hover {
+  background-color: var(--primary-color-hover);
+}
+
+/* ====================
+# login-form
+==================== */
+.login-form {
+  width: 100%;
+  display: grid;
+  gap: 32px;
+}
+
+.login-form__input-area {
+  width: 100%;
+  display: grid;
+  gap: 8px;
+}
+
+/* ====================
+# registration-area
+==================== */
+.registration-area {
+  width: 100%;
+  display: grid;
+  gap: 8px;
+  border-top: 1px solid var(--line-6);
+  padding-top: 32px;
+}
+
+.registration-area__text {
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  color: var(--font-fbfbfb);
+}
+
+.registration-area__link {
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  color: var(--link-color);
+}
+
+.registration-area__link:hover {
+  text-decoration: underline;
+}
