@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import './login.css';
+import './register.css';
 
 // components
 import InputArea from '../../components/inputArea/inputArea';
@@ -9,7 +9,7 @@ import InputArea from '../../components/inputArea/inputArea';
 // icons
 import { FaRegCircleUser } from "react-icons/fa6";
 
-const Login = () => {
+const Register = () => {
   const [userName, setUserName] = useState('');
   const [userNameSupportingText, setUserNameSupportingText] = useState('');
   const [password, setPassword] = useState('');
@@ -126,40 +126,13 @@ const Login = () => {
           <p className="registration-area__text">
             アカウントをおもちでないですか？
           </p>
-          <Link href="/register" className="registration-area__link">
+          <Link href="/registration" className="registration-area__link">
             新規登録はこちらから
           </Link>
         </div>
       </div>
     </div>
-    // <div className={styles.container}>
-    //   <h1>ログイン</h1>
-    //   <FaRegCircleUser className=''/>
-    //   <form onSubmit={handleSubmit}>
-    //     <div className={styles.inputGroup}>
-    //       <label htmlFor="email">メールアドレス</label>
-    //       <input
-    //         type="email"
-    //         id="email"
-    //         value={email}
-    //         onChange={(e) => setEmail(e.target.value)}
-    //         required
-    //       />
-    //     </div>
-    //     <div className={styles.inputGroup}>
-    //       <label htmlFor="password">パスワード</label>
-    //       <input
-    //         type="password"
-    //         id="password"
-    //         value={password}
-    //         onChange={(e) => setPassword(e.target.value)}
-    //         required
-    //       />
-    //     </div>
-    //     <button type="submit">ログイン</button>
-    //   </form>
-    // </div>
   );
 };
 
-export default Login;
+export default Register;
