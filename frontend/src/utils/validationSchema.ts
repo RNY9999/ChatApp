@@ -1,7 +1,7 @@
 import * as z from 'zod';
 // zodによるschemaの定義
 
-const schema = z
+const validationSchema = z
   .object({
     userName: z
       .string()
@@ -10,4 +10,4 @@ const schema = z
       .regex(/^[a-zA-Z0-9!-/:-@[-`{-~]*$/, 'ユーザーネームは英数字、及び特定の記号のみで入力してください'),
   });
 
-export default schema;
+export default validationSchema;
