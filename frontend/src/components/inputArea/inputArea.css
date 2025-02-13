@@ -40,6 +40,11 @@
   background-color: var(--dark-2);
 }
 
+/* .input-area__input内のinputタグがfocusされたときに、.input-area__inputのボーダーカラーを変更*/
+.input-area__input:focus-within {
+  border-color: var(--primary-color);
+}
+
 .input-area__input.--have-icon {
   padding-right: 42px;
   position: relative;

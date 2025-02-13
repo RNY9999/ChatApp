@@ -132,33 +132,6 @@ const Login = () => {
         </div>
       </div>
     </div>
-    // <div className={styles.container}>
-    //   <h1>ログイン</h1>
-    //   <FaRegCircleUser className=''/>
-    //   <form onSubmit={handleSubmit}>
-    //     <div className={styles.inputGroup}>
-    //       <label htmlFor="email">メールアドレス</label>
-    //       <input
-    //         type="email"
-    //         id="email"
-    //         value={email}
-    //         onChange={(e) => setEmail(e.target.value)}
-    //         required
-    //       />
-    //     </div>
-    //     <div className={styles.inputGroup}>
-    //       <label htmlFor="password">パスワード</label>
-    //       <input
-    //         type="password"
-    //         id="password"
-    //         value={password}
-    //         onChange={(e) => setPassword(e.target.value)}
-    //         required
-    //       />
-    //     </div>
-    //     <button type="submit">ログイン</button>
-    //   </form>
-    // </div>
   );
 };
 

@@ -1,4 +1,7 @@
 'use client';
+import { zodResolver } from '@hookform/resolvers/zod';
+import schema from '../../types/schemas';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import React, { useState } from 'react';
 import Link from 'next/link';
 import './register.css';
@@ -8,131 +11,33 @@ import InputArea from '../../components/inputArea/inputArea';
 
 // icons
 import { FaRegCircleUser } from "react-icons/fa6";
+import { watch } from 'fs';
 
+// react-hook-form用の型設定
+type RegisterInformation = {
+  userName: string,
+  password: string,
+};
 const Register = () => {
-  const [userName, setUserName] = useState('');
-  const [userNameSupportingText, setUserNameSupportingText] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordSupportingText, setPasswordSupportingText] = useState('');
-  const [userNameIsAttention, setUserNameIsAttention] = useState(false);
-  const [passwordIsAttention, setPasswordIsAttention] = useState(false);
-  const [pageMessage, setPageMessage] = useState('');
-  const [pageMessageClass, setPageMessageClass] = useState('login-page__message --hidden');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // ログイン処理をここに追加
-    console.log('userName:', userName);
-    console.log('Password:', password);
-
-    // userNameまたpasswordが入力されていない場合
-    if (!userName || !password) {
-      if (!userName) {
-        setUserNameSupportingText('ユーザーネームを入力してください');
-        setUserNameIsAttention(true);
-      }
-      // passwordが入力されていない場合
-      if (!password) {
-        setPasswordSupportingText('パスワードを入力してください');
-        setPasswordIsAttention(true);
-      }
-      return;
-    }
-
-    // ログイン処理を追加
-    // ログイン処理が成功した場合は、トップページに遷移
-    let loginCheck = false; // 本来はバックエンドとの通信を行った結果loginCheckで受け取る
-    if(userName === 'test' && password === 'test') {
-      loginCheck = true;
-    }
-    if (loginCheck) {
-      // /topに遷移
-      window.location.href = '/top';
-    } else {
-      // ログイン処理が失敗した場合は、エラーメッセージを表示
-      setPageMessage('ユーザーネームまたはパスワードが間違っています');
-      setPageMessageClass('login-page__message');
-    }
-    // ログイン処理が失敗した場合は、エラーメッセージを表示
-
-
-    
-
+  // react-hook-formの設定
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<RegisterInformation>(resolver: zodResolver(schema));
+  const onSubmit: SubmitHandler<RegisterInformation> = (data) => {
+    console.log(data);
   };
 
+  console.log(watch('userName'));
+
+
+  const [pageMessage, setPageMessage] = useState('');
+  const [pageMessageClass, setPageMessageClass ] = useState('register-page__message --hidden');
+
   return (
-    <div className="login-page">
-      <div className='login-modal'>
-        <div className="login-modal__title">
-          <FaRegCircleUser className='login-modal__icon'/>
-          <h1 className="login-modal__title">ログイン</h1>
-        </div>
-        <p className={pageMessageClass}>
-          {pageMessage}
-        </p>
-        <form action="" onSubmit={handleSubmit} className="login-form">
-          <div className="login-form__input-area">
-            <InputArea
-              type="text"
-              labelName="ユーザーネーム"
-              name="userName"
-              haveAttention={userNameIsAttention}
-              setHaveAttention={setUserNameIsAttention}
-              supportingText={userNameSupportingText}
-              setSupValue={setUserNameSupportingText}
-              value={userName}
-              setValue={setUserName}
-              options={[
-                {
-                  pageName: 'login',
-                  optionValueContent: '',
-                  setOptionValue: setPageMessage
-                },
-                {
-                  pageName: 'login',
-                  optionValueContent: 'login-page__message --hidden',
-                  setOptionValue: setPageMessageClass
-                }
-              ]}
-            />
-            <InputArea
-              type="password"
-              labelName="パスワード"
-              name="userPassword"
-              haveAttention={passwordIsAttention}
-              setHaveAttention={setPasswordIsAttention}
-              supportingText={passwordSupportingText}
-              setSupValue={setPasswordSupportingText}
-              value={password}
-              setValue={setPassword}
-              haveIcon={true}
-              options={[
-                {
-                  pageName: 'login',
-                  optionValueContent: '',
-                  setOptionValue: setPageMessage
-                },
-                {
-                  pageName: 'login',
-                  optionValueContent: 'login-page__message --hidden',
-                  setOptionValue: setPageMessageClass
-                }
-              ]}
-            />
-          </div>
-          <button type="submit" className="login-modal__submit">ログイン</button>
-        </form>
-        <div className="registration-area">
-          <p className="registration-area__text">
-            アカウントをおもちでないですか？
-          </p>
-          <Link href="/registration" className="registration-area__link">
-            新規登録はこちらから
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input defaultValue='testUser' {...register('userName', {required: true})} />
+      {errors.userName && <span>This field is required</span>}
+      <button type='submit'>送信</button>
+    </form>
+  )
 };
 
 export default Register;
