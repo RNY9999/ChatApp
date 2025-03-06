@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^4.0.0",
+    "axios": "^1.8.1",
     "frontend": "file:",
     "next": "15.1.6",
     "react": "^19.0.0",
