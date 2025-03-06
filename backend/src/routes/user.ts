@@ -5,7 +5,8 @@ const router = Router();
 
 // ユーザー登録
 router.post('/register', async (req, res) => {
-  const { username, password } = req.body;
+  const username = req.body.userName;
+  const password = req.body.password;
   try {
     const newUser = new User({ username, password });
     await newUser.save();
