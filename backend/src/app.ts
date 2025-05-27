@@ -10,10 +10,12 @@ dotenv.config();
 const app = express();
 
 // CORSの設定
-app.use(cors({
-  origin: process.env.DEV_FRONTEND_URL,
-  credentials: true,
-}));
+if (process.env.DEV_FRONTEND_URL && process.env.DEV_ADMIN_URL) {
+  app.use(cors({
+    origin: [process.env.DEV_FRONTEND_URL, process.env.DEV_ADMIN_URL],
+    credentials: true,
+  }));
+}
 
 // ミドルウェアの設定
 app.use(express.json());
