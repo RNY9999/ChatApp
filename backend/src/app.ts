@@ -32,12 +32,12 @@ app.get('/', (req, res) => {
 });
 
 const mongoOptions: ConnectOptions = {
-  user: process.env.DB_USER,
-  pass: process.env.DB_PASS,
+  user: process.env.MONGO_USER,
+  pass: process.env.MONGO_PASS,
 };
 
 // MongoDBの接続
-mongoose.connect(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`, mongoOptions)
+mongoose.connect(`mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_NAME}`, mongoOptions)
 .then(() => {
   console.log('Successfully connected to MongoDB');
 })
