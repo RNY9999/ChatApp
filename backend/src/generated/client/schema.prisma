@@ -1,0 +1,28 @@
+/**
+ * generate prisma-client
+ * provider: "prisma-client-js"は、Prisma Clientを生成するためのプロバイダー
+ * output: "../src/generated/client"は、生成されたPrisma Clientの出力先ディレクトリを指定しています。この場合、プロジェクトのsrc/generated/clientディレクトリに生成されます。
+ */
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("POSTGRES_URL")
+}
+
+/**
+ * Userモデル
+ * id: ユーザ識別子、ユニークなID、オートインクリメント
+ * name:
+ */
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  deleted   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
