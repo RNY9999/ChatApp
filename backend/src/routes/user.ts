@@ -31,6 +31,7 @@ router.get('/getList', async (req, res): Promise<void> => {
       });
       res.status(200).json(users);
   } catch (err: any) {
+      console.error('Error fetching users:', err);
       res.status(500).json({ error: err.message });
   }
 });
