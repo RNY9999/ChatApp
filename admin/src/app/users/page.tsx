@@ -1,12 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
-// component
-import Navigation from '../../components/navigation/navigation';
 
 // axios
 import axios from '../../utils/axiosInstance';
 
 type User = {
+  id: number;
   username: string;
   password: string;
   isDeleted: boolean;
@@ -29,20 +28,14 @@ export default function Users() {
     fetchStudents();
   }, []);
   return (
-    <>
-      <header className="header">
-        <h1 className="header__title">
-          ChatApp管理システム
-        </h1>
-      </header>
-      <aside className="aside">
-        <Navigation />
-      </aside>
-      <main>
-        {/* ユーザー一覧を表示 */}
+      <>
+        <h1>ユーザー一覧</h1>
         <table className="table">
           <thead className="table__header">
             <tr className="table__record">
+              <th className="table__header-cel">
+                id
+              </th>
               <th className="table__header-cel">
                 ユーザーネーム  
               </th>
@@ -68,26 +61,28 @@ export default function Users() {
                   className="table__body-record"
                 >
                   <td className="table__body-record-cel">
+                    {user.id}
+                  </td>
+                  <td className="table__body-record-cel">
                     {user.username}
                   </td>
                   <td className="table__body-record-cel">
                     {user.password}
                   </td>
                   <td className="table__body-record-cel">
-                    {user.isDeleted}
+                    {user.isDeleted ? '1' : '0'}
                   </td>
                   <td className="table__body-record-cel">
-                    {user.createdAt}
+                    {new Date(user.createdAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo'})}
                   </td>
                   <td className="table__body-record-cel">
-                    {user.updatedAt}
+                    {new Date(user.updatedAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo'})}
                   </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
-      </main>
-    </>
+      </>
   );
 }
