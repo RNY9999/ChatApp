@@ -1,0 +1,45 @@
+.table {
+  width: 100%;
+}
+
+.table__header {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  background-color: var(--bg-main);
+  border-bottom: 1px solid black;
+}
+
+.table__record {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.table__header-cel {
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.table__body {
+  width: 100%;
+  display: grid;
+  gap: 4px;
+}
+
+.table__body-record {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.table__body-record-cel {
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
