@@ -10,7 +10,7 @@ type User = {
   id: number;
   username: string;
   password: string;
-  isDeleted: boolean;
+  deleted: boolean;
   createdAt: string;
   updatedAt: string; 
 }
@@ -23,6 +23,7 @@ export default function Users() {
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_DEV_SERVER_URL}/api/users/getList`);
         setUsers(res.data);
+        console.log(res.data);
       } catch (error) {
         console.error('ERRORが発生しています' + error);
       }
@@ -79,7 +80,7 @@ export default function Users() {
                     {user.password}
                   </div>
                   <div className="table__body-record-cel">
-                    {user.isDeleted ? '1' : '0'}
+                    {user.deleted ? '1' : '0'}
                   </div>
                   <div className="table__body-record-cel">
                     {new Date(user.createdAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo'})}

@@ -2,7 +2,7 @@ export type User = {
   id: number;
   username: string;
   password: string;
-  isDeleted: boolean;
+  deleted: boolean;
   createdAt: string;
   updatedAt: string; 
 };
