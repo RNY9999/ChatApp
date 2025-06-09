@@ -11,6 +11,7 @@
 
 .edit-page__title {
   font-size: 20px;
+  color: var(--font-dark2);
 }
 
 .edit-page__contents {
@@ -23,4 +24,69 @@
 .edit-form {
   width: 100%;
   display: grid;
+  gap: 16px;
+}
+
+.edit-form__form {
+  width: 100%;
+  display: grid;
+  gap: 4px;
+}
+
+.edit-form__label {
+  font-size: 14px;
+  padding: 0 16px;
+}
+
+.edit-form__input-area {
+  width: 100%;
+  max-width: 400px;
+  padding: 8px 16px;
+  border: 1px solid var(--line-1);
+  border-radius: 8px;
+}
+
+.edit-form__input-area:focus {
+  outline: none;
+  border: 1px solid var(--primary-color);
+}
+
+.edit-form__error-text {
+  color: var(--error-color);
+}
+
+.edit-form__legend {
+  font-size: 14px;
+  padding: 0 16px;
+}
+
+.edit-form__custom-radio {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--line-1);
+  border-radius: 10px;
+  position: relative;
+}
+
+.edit-form__radio-area {
+  display: none;
+}
+
+.edit-form__radio-area:checked + .edit-form__custom-radio::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: var(--line-1);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.edit-form__radio-label {
+  width: 100%;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: auto auto 1fr;
 }
