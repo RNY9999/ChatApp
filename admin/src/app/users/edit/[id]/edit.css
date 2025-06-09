@@ -1,0 +1,26 @@
+.edit-page {
+  width: 100%;
+  display: grid;
+  gap: 16px;
+}
+
+.edit-page__header {
+  width: 100%;
+  height: fit-content;
+}
+
+.edit-page__title {
+  font-size: 20px;
+}
+
+.edit-page__contents {
+  width: 100%;
+  border: 1px solid #000;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.edit-form {
+  width: 100%;
+  display: grid;
+}

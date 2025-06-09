@@ -38,8 +38,11 @@ export default async function UserDetailPage({ params }: Params) {
             編集
           </button>
         </Link>
-
-        <DeleteForm userId={user.id} />
+        {/* user.deletedがtrueの時のみDeleteFormを出現 */}
+        {!user.deleted ? 
+            (<DeleteForm userId={user.id} />):
+            (<h2>Restore</h2>)
+        }
       </div>
     </div>
   );
