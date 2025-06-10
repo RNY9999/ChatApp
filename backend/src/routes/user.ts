@@ -4,6 +4,10 @@ import User from '../models/user';
 
 const router = Router();
 
+/**
+ * Userテーブルに対するCRUD操作
+ */
+
 // ユーザ詳細の取得
 router.get('/detail/:id', async (req, res): Promise<void> => {
   console.log('Fetching user details for ID:', req.params.id);
@@ -69,6 +73,39 @@ router.post('/register', async (req, res) => {
     res.status(201).json(newUser);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// ユーザアップデート
+router.put('/update/:id', async (req, res): Promise<void> => {
+  console.log('update user : ' , req.params.id);
+  const id: number = parseInt(req.params.id, 10);
+
+  if (isNaN(id)) {
+    res.status(400).json({ error: 'Invalid user ID' });
+    return;
+  }
+  const username: string = req.body.username;
+  const password: string = req.body.password;
+  let deleted: boolean = false;
+  if (req.body.deleted === 'true') {
+    deleted = true;
+  }
+
+  try {
+    console.log('update start');
+    await prisma.user.update({
+      where: {id},
+      data: {
+        username: username,
+        password: password,
+        deleted: deleted,
+      }
+    })
+    res.status(200).json({ message: 'User updated successfully' });
+  } catch(error: any) {
+    res.status(500).json({ error: error.message });
+    return;
   }
 });
 

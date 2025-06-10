@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import '../styles/global.css';
 import '../styles/variables.css';
+import '../styles/font.css'
 import './top.css';
 
 import Navigation from '../components/navigation/navigation';

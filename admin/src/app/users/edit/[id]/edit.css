@@ -11,12 +11,10 @@
 
 .edit-page__title {
   font-size: 20px;
-  color: var(--font-dark2);
 }
 
 .edit-page__contents {
   width: 100%;
-  border: 1px solid #000;
   padding: 16px;
   border-radius: 8px;
 }
@@ -24,18 +22,19 @@
 .edit-form {
   width: 100%;
   display: grid;
-  gap: 16px;
+  gap: 32px;
 }
 
 .edit-form__form {
   width: 100%;
   display: grid;
-  gap: 4px;
+  gap: 8px;
 }
 
 .edit-form__label {
   font-size: 14px;
   padding: 0 16px;
+  font-weight: 600;
 }
 
 .edit-form__input-area {
@@ -46,12 +45,23 @@
   border-radius: 8px;
 }
 
+.edit-form__input-area.--error {
+  border: 1px solid var(--error-color);
+  box-shadow: 0 0 4px 1px var(--error-color);
+}
+
 .edit-form__input-area:focus {
   outline: none;
   border: 1px solid var(--primary-color);
+  box-shadow: 0 0 4px 1px var(--primary-color);
 }
 
-.edit-form__error-text {
+.edit-form__supporting-text {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.edit-form__supporting-text.--error {
   color: var(--error-color);
 }
 
@@ -61,10 +71,11 @@
 }
 
 .edit-form__custom-radio {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--line-1);
-  border-radius: 10px;
+  display: block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--line-4);
+  border-radius: 8px;
   position: relative;
 }
 
@@ -77,11 +88,15 @@
   width: 10px;
   height: 10px;
   border-radius: 5px;
-  background-color: var(--line-1);
+  background-color: var(--primary-color);
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.edit-form__radio-area:checked + .edit-form__custom-radio {
+  border-color: var(--primary-color);
 }
 
 .edit-form__radio-label {
@@ -89,4 +104,50 @@
   display: grid;
   gap: 8px;
   grid-template-columns: auto auto 1fr;
+}
+
+.edit-form__radio-container {
+  display: grid;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.edit-form__radio-text {
+  font-size: 16px;
+}
+
+.edit-form__button-area {
+  width: 100%;
+  max-width: 400px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.edit-form__button {
+  width: 100%;
+  max-width: 200px;
+  background-color: var(--primary-color);
+  text-align: center;
+  padding: 16px;
+  border-radius: 4px;
+  color: var(--font-white1);
+  font-weight: 600;
+}
+
+.edit-form__button:hover {
+  box-shadow: 0 2 4 0 rgba(0, 0, 0, .5);
+}
+
+.edit-form__button.--disabled {
+  background-color: var(--dark-6);
+  box-shadow: none;
+}
+
+.edit-form__button.--cancel {
+  background-color: var(--dark-6);
+}
+
+.edit-form__button:active {
+  box-shadow: none;
 }

@@ -6,7 +6,7 @@
   --bg-accent: rgb(56, 77, 198);
 
   /* project color */
-  --primary-color: #89D751;
+  --primary-color: #0070f3;
   /* --primary-color-hover: #98C379; 旧メインカラー*/
   --primary-color-hover: #89D765;
 
@@ -14,16 +14,19 @@
   --link-color: #4493f8;
 
   /* error color */
-  --error-color: #eda4bc;
+  --error-color: #f41e1e;
 
   /* font color */
   --font-dark1 : #202020;
   --font-dark2 : #333;
   --font-dark3 : #404040;
-  --font-fbfbfb: #fbfbfb;
-  --font-f7f7f7: #f7f7f7;
-  --font-f0f0f0: #f0f0f0;
+  --font-white1: #fbfbfb;
+  --font-white2: #f7f7f7;
+  --font-white3: #f0f0f0;
   --font-b3b3b3: #b3b3b3;
+  /* white mode*/
+  --white-1: #fafafa;
+  --white-2: #f2f2f2;
 
   /* dark mode */
   --dark-1: #272727;
@@ -35,7 +38,7 @@
   /* line col */
   --line-1: #272727;
   --line-2: #343434;
-  --line-3: #414141;
+  --line-3: #333;
   --line-4: #555;
   --line-5: #7a7a7a;
   --line-6: #888;

@@ -13,6 +13,8 @@ const validationSchema = z
       .min(6, 'パスワードは6文字以上で設定してください')
       .max(20, 'パスワードは20文字以下で設定してください')
       .regex(/^[a-zA-Z0-9!-/:-@[-`{-~]*$/, 'パスワードは英数字、及び特定の記号のみで設定してください'),
+    deleted: z
+      .string()
   });
 
 export default validationSchema;
