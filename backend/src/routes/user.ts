@@ -1,6 +1,10 @@
 import { Router } from 'express';
 import prisma from '../prisma';
 import User from '../models/user';
+import { uploadBanner, uploadIcon } from '../middleware/upload';
+import fs from 'fs';
+import path from 'path';
+import { error } from 'console';
 
 const router = Router();
 
@@ -147,6 +151,58 @@ router.post('/delete/:id', async (req, res): Promise<void> => {
   } catch (err: any) {
     console.error('Error deleting user: ', err);
     res.status(500).json({ error: err.message });
+    return;
+  }
+});
+
+// バナー画像のアップロード
+router.post('/upload/banner/:id', uploadBanner.single('banner'), async(req, res): Promise<void> => {
+  try {
+    if (!req.file) {
+      res.status(400).json({ error: 'ファイルが選択されていません' });
+      return;
+    }
+
+    const userId = parseInt(req.params.id, 10);
+    const bannerUrl = `/banner/${req.file.filename}`;
+
+    // 既存のバナー画像を削除
+    const existingUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { banner_url: true }
+    });
+
+    if (existingUser?.banner_url) {
+      const oldFilePath = path.join(__dirname, '../public', existingUser.banner_url);
+      if (fs.existsSync(oldFilePath)) {
+        fs.unlinkSync(oldFilePath);
+      }
+    }
+
+    // データベースを更新
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { banner_url: bannerUrl },
+      select: {
+        id: true,
+        username: true,
+        global_display_name: true,
+        icon_url: true,
+        banner_url: true
+      }
+    });
+
+    res.status(200).json( {message: 'バナー画像がアップロードされました。'});
+    return;
+  } catch (error: any) {
+    // エラー時はアップロードされたファイルを削除
+    if (req.file) {
+      const filePath = path.join(__dirname, '../public/banner', req.file.fieldname);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+    res.status(500).json({ error: error.message });
     return;
   }
 });
