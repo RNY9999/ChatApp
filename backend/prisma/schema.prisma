@@ -13,10 +13,14 @@ datasource db {
 /// id: ユーザ識別子、ユニークなID、オートインクリメント
 /// name:
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  password  String
-  deleted   Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                  Int      @id @default(autoincrement())
+  username            String   @unique
+  global_display_name String? 
+  password            String
+  icon_url            String?
+  banner_url          String?
+  deleted             Boolean  @default(false)
+  admin_note          String? // 管理画面で管理者がメモをする
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
