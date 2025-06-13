@@ -1,0 +1,4 @@
+declare var process: any;
+declare module 'express';
+declare module 'cors';
+declare module 'dotenv';
