@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import mongoose, { ConnectOptions } from 'mongoose';
 import userRoutes from './routes/user';
 import cors from 'cors';
+import path from 'path';
 
 // .envファイルの読み込み
 dotenv.config();
@@ -20,9 +21,11 @@ if (process.env.DEV_FRONTEND_URL && process.env.DEV_ADMIN_URL) {
 // ミドルウェアの設定
 app.use(express.json());
 
+// 静的ファイルの公開
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
 // ルートの設定
 // サーバに対してリクエストがあった際に、console.logで表示する
-
 
 app.use('/api/users', userRoutes);
 

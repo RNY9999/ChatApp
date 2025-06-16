@@ -23,20 +23,14 @@ export default async function UserEditPage({ params }: Params) {
           <div className="edit-page__header">
               <h1 className='edit-page__title'>ユーザ情報編集</h1>
           </div>
-          <div>
+          <div className='edit-page__contents'>
               <EditForm user={ user }/>
-              <h2>{user.banner_url}</h2>
-              {/* <Image
-                src={`http://localhost:5000${user.banner_url}`}
+              <Image
+                src={`http://localhost:5000/public${user.banner_url}`}
                 alt="ユーザバナー"
-                width={600}
-                height={200}
+                width={300}
+                height={50}
                 style={{ objectFit: 'cover' }}
-              /> */}
-              <img 
-                src={`http://localhost:5000${user.banner_url}`} 
-                alt="バナー画像"
-                style={{ width: '100%', height: '200px', objectFit: 'cover' }}
               />
           </div>
       </div>

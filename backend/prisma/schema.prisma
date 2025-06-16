@@ -7,11 +7,6 @@ datasource db {
   provider = "postgres"
   url      = env("POSTGRES_URL")
 }
-
-/// *
-/// Userモデル
-/// id: ユーザ識別子、ユニークなID、オートインクリメント
-/// name:
 model User {
   id                  Int      @id @default(autoincrement())
   username            String   @unique
