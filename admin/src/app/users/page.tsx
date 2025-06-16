@@ -1,15 +1,16 @@
 'use client';
 import { useEffect, useState } from 'react';
-// component
-import Navigation from '../../components/navigation/navigation';
+import Link from 'next/link';
+import './users.css';
 
 // axios
 import axios from '../../utils/axiosInstance';
 
 type User = {
+  id: number;
   username: string;
   password: string;
-  isDeleted: boolean;
+  deleted: boolean;
   createdAt: string;
   updatedAt: string; 
 }
@@ -22,6 +23,7 @@ export default function Users() {
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_DEV_SERVER_URL}/api/users/getList`);
         setUsers(res.data);
+        console.log(res.data);
       } catch (error) {
         console.error('ERRORが発生しています' + error);
       }
@@ -29,65 +31,68 @@ export default function Users() {
     fetchStudents();
   }, []);
   return (
-    <>
-      <header className="header">
-        <h1 className="header__title">
-          ChatApp管理システム
-        </h1>
-      </header>
-      <aside className="aside">
-        <Navigation />
-      </aside>
-      <main>
-        {/* ユーザー一覧を表示 */}
-        <table className="table">
-          <thead className="table__header">
-            <tr className="table__record">
-              <th className="table__header-cel">
+      <>
+        <div className="register">
+          <Link href="/users/register">
+            新規ユーザー登録
+          </Link>
+        </div>
+        <h1>ユーザー</h1>
+        <div className="table">
+          <div className="table__header">
+            <div className="table__record">
+              <div className="table__header-cel">
+                ID
+              </div>
+              <div className="table__header-cel">
                 ユーザーネーム  
-              </th>
-              <th className="table__header-cel">
+              </div>
+              <div className="table__header-cel">
                 パスワード
-              </th>
-              <th className="table__header-cel">
+              </div>
+              <div className="table__header-cel">
                 論理削除フラグ
-              </th>
-              <th className="table__header-cel">
-                create_time
-              </th>
-              <th className="table__header-cel">
-                update_time
-              </th>
-            </tr>
-          </thead>
-          <tbody className="table__body">
-            {users.map((user, index) => {
+              </div>
+              <div className="table__header-cel">
+                登録日
+              </div>
+              <div className="table__header-cel">
+                更新日
+              </div>
+            </div>
+          </div>
+          <div className="table__body">
+            {users.map((user) => {
               return (
-                <tr
-                  key={index}
+                <div
+                  key={user.id}
                   className="table__body-record"
                 >
-                  <td className="table__body-record-cel">
+                  <div className="table__body-record-cel">
+                    <Link href={`/users/detail/${user.id}`}>
+                      {user.id}
+                    </Link>
+                  </div>
+                  <div className="table__body-record-cel">
                     {user.username}
-                  </td>
-                  <td className="table__body-record-cel">
+                  </div>
+                  <div className="table__body-record-cel">
                     {user.password}
-                  </td>
-                  <td className="table__body-record-cel">
-                    {user.isDeleted}
-                  </td>
-                  <td className="table__body-record-cel">
-                    {user.createdAt}
-                  </td>
-                  <td className="table__body-record-cel">
-                    {user.updatedAt}
-                  </td>
-                </tr>
+                  </div>
+                  <div className="table__body-record-cel">
+                    {user.deleted ? '1' : '0'}
+                  </div>
+                  <div className="table__body-record-cel">
+                    {new Date(user.createdAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo'})}
+                  </div>
+                  <div className="table__body-record-cel">
+                    {new Date(user.updatedAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo'})}
+                  </div>
+                </div>
               );
             })}
-          </tbody>
-        </table>
-      </main>
-    </>
+          </div>
+        </div>
+      </>
   );
 }

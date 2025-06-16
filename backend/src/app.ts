@@ -26,6 +26,11 @@ app.use(express.json());
 
 app.use('/api/users', userRoutes);
 
+app.get('/test', (req, res) => {
+  res.send('this is test');
+  console.log('this is test too');
+})
+
 app.get('/', (req, res) => {
   res.send('Hello Express!');
   console.log('hello');
