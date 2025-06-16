@@ -1,0 +1,47 @@
+.aside {
+  width: 250px;
+  height: 100vh;
+  background-color: var(--bg-main);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  place-items: center;
+  align-items: start;
+  box-shadow: 2px 0px 4px 2px rgba(0, 0, 0, .2);
+  position: fixed;
+}
+
+.aside__title {
+  width: 100%;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+}
+
+.navigation {
+  width: 100%;
+}
+
+.navigation__lists {
+  width: 100%;
+  display: grid;
+}
+
+.navigation__list {
+  width: 100%;
+}
+
+.navigation__link {
+  width: 100%;
+  display: block;
+  padding: 8px;
+  font-size: 14px;
+}
+
+.navigation__link:hover {
+  background-color: var(--bg-primary);
+}
+
+.navigation__link.--active {
+  background-color: var(--bg-primary);
+}
