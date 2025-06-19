@@ -1,7 +1,7 @@
 import path from 'path';
 
 describe('CORS設定の動作テスト', () => {
-  const originalEnv = process.env;
+  const originalEnv = { ...process.env };
 
   beforeEach(() => {
     jest.resetModules(); // モジュールキャッシュをクリア

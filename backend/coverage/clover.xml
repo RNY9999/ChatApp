@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1750170182163" clover="3.2.0">
-  <project timestamp="1750170182164" name="All files">
+<coverage generated="1750321617596" clover="3.2.0">
+  <project timestamp="1750321617596" name="All files">
     <metrics statements="21" coveredstatements="21" conditionals="10" coveredconditionals="10" methods="0" coveredmethods="0" elements="31" coveredelements="31" complexity="0" loc="21" ncloc="21" packages="1" files="1" classes="1"/>
-    <file name="cors.ts" path="C:\Users\renny\OneDrive\デスクトップ\GitHub\ChatApp\backend\src\config\cors.ts">
+    <file name="cors.ts" path="C:\Users\RENYA HISAMATSU\Desktop\gitHub\ChatApp\backend\src\middleware\cors.ts">
       <metrics statements="21" coveredstatements="21" conditionals="10" coveredconditionals="10" methods="0" coveredmethods="0"/>
       <line num="5" count="4" type="cond" truecount="4" falsecount="0"/>
       <line num="7" count="1" type="stmt"/>

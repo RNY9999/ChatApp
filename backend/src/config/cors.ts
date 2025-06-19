@@ -34,7 +34,9 @@ if (process.env.NODE_ENV === 'development') {
   console.log(`■CORS設定\nallowedOrigins: ${allowedOrigins}`);
 }
 
-export const corsOptions = {
+const corsOptions = {
   origin: allowedOrigins.filter(Boolean),
   credentials: true, // cookieや認証ヘッダの送受信を許可
 }
+
+export default corsOptions;
