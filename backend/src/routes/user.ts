@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import prisma from '../prisma';
-import User from '../models/user';
 import { uploadBanner, uploadIcon } from '../middleware/upload';
 import fs from 'fs';
 import path from 'path';
@@ -64,19 +63,6 @@ router.get('/getList', async (req, res): Promise<void> => {
   } catch (err: any) {
       console.error('Error fetching users:', err);
       res.status(500).json({ error: err.message });
-  }
-});
-
-// ユーザー登録
-router.post('/register', async (req, res) => {
-  const username = req.body.userName;
-  const password = req.body.password;
-  try {
-    const newUser = new User({ username, password });
-    await newUser.save();
-    res.status(201).json(newUser);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
   }
 });
 

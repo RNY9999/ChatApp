@@ -14,7 +14,7 @@ describe('CORS設定の動作テスト', () => {
 
   const runWithEnv = (env: Partial<NodeJS.ProcessEnv>) => {
     Object.assign(process.env, env); // 環境変数を上書き
-    return require(path.resolve(__dirname, '../src/config/cors')).corsOptions;
+    return require(path.resolve(__dirname, '../../src/config/cors')).default;
   };
 
   it('development の場合、DEV_系URLが含まれる', () => {

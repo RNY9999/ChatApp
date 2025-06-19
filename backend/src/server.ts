@@ -3,9 +3,19 @@ dotenv.config();
 
 import app from './app';
 
-const PORT = process.env.PORT || 5000;
-console.log(process.env.MESSAGE);
+const UNDEFINED_PORT: number = 9989;
+const PORT: number  = Number(process.env.PORT ?? UNDEFINED_PORT);
 
-app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
-});
+const main = async () => {
+  try {
+    // サーバの起動
+    app.listen(PORT, () => {
+      console.log(`${process.env.NODE_ENV ?? 'unknown server'} Server is running at http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('✖サーバ起動失敗: ', error);
+    process.exit(1);
+  }
+};
+
+main();
