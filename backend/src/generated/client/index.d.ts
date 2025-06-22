@@ -15,10 +15,7 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 /**
  * Model User
- * *
- * Userモデル
- * id: ユーザ識別子、ユニークなID、オートインクリメント
- * name:
+ * 
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 
