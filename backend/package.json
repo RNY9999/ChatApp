@@ -7,7 +7,7 @@
     "test_show_coverage": "jest --coverage",
     "test:watch": "jest --watchAll",
     "start": "ts-node src/server.ts",
-    "dev": "nodemon src/server.ts",
+    "dev": "nodemon src/code-test.ts",
     "build": "tsc",
     "seed": "ts-node prisma/seed.ts"
   },

@@ -1,5 +1,18 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '@lib/prisma';
+
+// 型情報のimport
+import {
+  SelectOptions,
+  CreateUser,
+  UpdateUser,
+  UpdateUserId,
+  GetUsers,
+  GetUserById,
+  DeleteUserId,
+  Options,
+  defaultSelectOptions,
+} from "../../types/user.types"
 /**
  * todo
  * ・ページネーション対応：pageとlimitによるリスト分割
@@ -7,84 +20,15 @@ import { prisma } from '@lib/prisma';
  * ・Prismaのmiddleware活用：ログ出力や共通バリデーションなど
  * ・Where句の別ファイルへの切り分け：共通関数として再利用性を高める
  */
-// '>=' | '>' | '=' | '<' | '<=' | '<>' = 'gte' | 'gt' | 'equals' | 'lt' | 'lte' | 'not'
-type Operator = 'gte' | 'gt' | 'equals' | 'lt' | 'lte' | 'not'
-type SelectOptions = {
-  id?: boolean,
-  username?: boolean,
-  global_display_name?: boolean,
-  icon_url?: boolean,
-  banner_url?: boolean,
-  deleted?: boolean,
-  admin_note?: boolean,
-  createdAt?: boolean,
-  updatedAt?: boolean,
-};
 
-type CreateUser = {
-  username: string,
-  global_display_name?: string,
-  password: string,
-  icon_url?: string,
-  banner_url?: string,
-  admin_note?: string,
-};
-
-type UpdateUser = {
-  username?: string,
-  global_display_name?: string,
-  icon_url?: string,
-  banner_url?: string,
-  deleted?: boolean,
-  admin_note?: string,
-};
-
-type UpdateUserId = {
-  id: number,
-};
-
-type GetUsers = {
-  ids?: number[],
-  username?: string,
-  username_like?: string,
-  global_display_name?: string,
-  global_display_name_like?: string,
-  deleted?: boolean,
-  compCreatedAt?: string,
-  createdAtOperator?: Operator,
-  compUpdatedAt?: string,
-  updatedAtOperator?: Operator,
-};
-
-type GetUserById = {
-  id: number,
-};
-
-type DeleteUserId = {
-  id: number,
-};
-
-type Options = {
-  sortColumn?: string,
-  sortType?: 'asc' | 'desc',
-  limit?: number
-};
-
-const defaultSelectOptions: SelectOptions = {
-  id: false,
-  username: false,
-  global_display_name: false,
-  icon_url: false,
-  banner_url: false,
-  deleted: false,
-  admin_note: false,
-  createdAt: false,
-  updatedAt: false,
-}
 
 // ユーザの作成
-export const createUser = async (data: CreateUser) => {
+export const createUser = async (
+  data: CreateUser,
+  selectOptions: SelectOptions = defaultSelectOptions
+) => {
   return await prisma.user.create({
+    select: selectOptions,
     data: data,
   });
 };
@@ -164,7 +108,7 @@ export const getUsers = async (
   });
 };
 
-// idによるユーザ一人の取得
+// idによるユーザ1人の取得
 export const getUserById = async (
   searchData: GetUserById,
   selectOptions: SelectOptions = defaultSelectOptions
