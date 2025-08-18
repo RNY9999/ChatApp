@@ -26,6 +26,61 @@ tags:
 
 paths:
   /api/admin/session:
+    get:
+      tags:
+        - Admin Session
+      summary: 管理者ログインチェック
+      operationId: adminLoginCheck
+      description: |
+        Cookie`ln_admin_sid`を検証し、セッションの有効性と権限レベルを返す。
+        このエンドポイントでは原則 Set-Cookie を返さない
+      security:
+        - CookieAuth: []
+      responses:
+        '200':
+          description: 有効なセッション
+          headers:
+            Cache-Control:
+              description: |
+                ブラウザにキャッシュさせるかどうか。
+                基本は `no-store`
+              schema:
+                type: string
+                example: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionStatus'
+              examples:
+                fullSession:
+                  summary: 通常（full）セッション
+                  value:
+                    valid: true
+                    expiresAt: "2025-08-18T06:00:00Z"
+                    admin:
+                      id: 2
+                      email: "linknest@example.com"
+                preOtpSession:
+                  summary: pre-otpセッション（初回ログイン時・OTP未完了）
+                  value:
+                    valid: true
+                    expiresAt: "2025-08-18T06:00:00Z"
+                    admin:
+                      id: 3
+                      email: "first-login@example.com"
+        '401':
+          description: 無効（未ログイン / 期限切れ / リボーク済み）
+          headers:
+            Cache-Control:
+              description: |
+                ブラウザにキャッシュさせるかどうか。
+                基本は `no-store`
+              schema:
+                type: string
+                example: no-store
+          $ref: '#/components/responses/InvalidSession'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags:
         - Admin Session
@@ -103,7 +158,29 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
 components:
+  securitySchemes:
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: ln_admin_sid
+      description: HttpOnly クッキーに保持する管理者セッションID
   schemas:
+    SessionStatus:
+      type: object
+      required:
+        - valid
+      properties:
+        valid:
+          type: boolean
+          example: true
+          description: セッションが有効かどうか
+        expiresAt:
+          type: string
+          format: date-time
+          example: "2025-08-19T07:33:00Z"
+          description: セッション失効予定時刻（返却は任意）
+        admin:
+          $ref: '#/components/schemas/AdminPublic' # (返却は任意)
     LoginRequest:
       type: object
       required:
@@ -166,6 +243,8 @@ components:
         message:
           type: string
           example: error message
+        nextPath:
+          $ref: '#/components/schemas/NextPath'
   responses:
     BadRequest:
       description: バリデーションエラー等不正なリクエスト
@@ -186,9 +265,23 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
           examples:
             unauthorized:
+              summary: 認証失敗
               value:
                 code: "UNAUTHORIZED"
                 message: "ID（メールアドレス）またはパスワードが異なります。"
+    InvalidSession:
+      description: セッションが無効（未ログイン / 期限切れ / リボーク済み）
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            haveNoSession:
+              summary: 無効なセッション
+              value:
+                code: "UNAUTHORIZED"
+                message: "セッションが無効です。"
+                nextPath: "/login"
     MaxRequest:
       description: |
         アカウントロック時（本登録・初回登録問わず）<br>
