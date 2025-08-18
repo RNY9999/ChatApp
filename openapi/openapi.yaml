@@ -1,0 +1,231 @@
+openapi: '3.0.3'
+
+info:
+  title: Linknest 管理者 API
+  description: |
+    ## Linknest 管理者 API仕様書
+    - Linknest管理者API一覧を記載。
+    - requestとresponseを詳細まで記載。
+    ---
+    ## サーバに関して
+    現在は開発環境しか用意していないためAPIのテストも開発環境でのみ行う。<br>
+    今後準本番（stg）や本番（prod）環境を作成次第テスト実施予定。
+  version: '1.0.0'
+
+servers:
+  - url: http://localhost:5000
+    description: 開発環境URL
+
+tags:
+  - name: Admin Session
+    description: 管理者セッション（ログイン/ログアウト/セッション確認）
+  - name: Admin Login Log
+    description: 管理者ログインログ
+  - name: Server Running Test
+    description: サーバ疎通確認用
+
+paths:
+  /api/admin/session:
+    post:
+      tags:
+        - Admin Session
+      summary: 管理者ログイン
+      operationId: adminLogin
+      description: |
+        認証に成功するとサーバ側でセッションを作成し、`HttpOnly`クッキーとして返却する。<br>
+        OTP必須のユーザは202で応答し、OTP入力画面へ誘導する。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              normal:
+                summary: 正常ログイン
+                value:
+                  email: linknest@example.com
+                  password: Asdf1234!
+              wrongPassword:
+                summary: 認証失敗（パスワード間違い）
+                value:
+                  email: linknest@example.com
+                  password: wrongPassword
+      responses:
+        '200':
+          description: ログイン成功・セッション確立
+          headers:
+            Set-Cookie:
+              description: |
+                セッションクッキー（例: `ln_admin_sid={token}; Path=/; HttpOnly; Secure; SameSite=Lax;`）
+                - 開発環境では Secure 省略の可能性あり
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginSuccess'
+              examples:
+                normal:
+                  value:
+                    nextPath: "/top"
+                    admin:
+                      id: 2
+                      email: "linknest@example.com"
+        '202':
+          description: |
+            OTP認証が必要（初回ログイン時等）<br>
+            初回ログイン時のセッションを確立。<br>
+            ※初回ログイン完了時はセッションをローテーション（Session Fixation対策）。
+          headers:
+            Set-Cookie:
+              description: |
+                セッションクッキー（例: `ln_admin_sid={token}; Path=/; HttpOnly; Secure; SameSite=Lax;`）
+                - 開発環境では Secure 省略の可能性あり
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OtpRequired'
+              examples:
+                first_login:
+                  value:
+                    nextPath: "/login/first/otp/send"
+                    otpDeliveryAddress: "linknest@example.com"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '423':
+          $ref: '#/components/responses/MaxRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: linknest@example.com
+        password:
+          type: string
+          format: password
+          example: Asdf12345!
+    LoginSuccess:
+      type: object
+      required:
+        - nextPath
+        - admin
+      properties:
+        nextPath:
+          $ref: '#/components/schemas/NextPath'
+        admin:
+          $ref: '#/components/schemas/AdminPublic'
+    OtpRequired:
+      type: object
+      required:
+        - nextPath
+        - otpDeliveryAddress
+      properties:
+        nextPath:
+          $ref: '#/components/schemas/NextPath'
+        otpDeliveryAddress:
+          type: string
+          format: email
+          example: linknest@example.com
+          description: OTP送信先メールアドレス
+    AdminPublic:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          format: email
+          example: linknest@example.com
+    NextPath:
+      type: string
+      example: /top
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: error code
+        message:
+          type: string
+          example: error message
+  responses:
+    BadRequest:
+      description: バリデーションエラー等不正なリクエスト
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            invalidInput:
+              value:
+                code: "BAD_REQUEST"
+                message: "不正な入力値です。" 
+    Unauthorized:
+      description: 認証失敗
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            unauthorized:
+              value:
+                code: "UNAUTHORIZED"
+                message: "ID（メールアドレス）またはパスワードが異なります。"
+    MaxRequest:
+      description: |
+        アカウントロック時（本登録・初回登録問わず）<br>
+            - 本登録時
+            ```
+            現在アカウントがロックされています。
+            ○○時○○分以降に再度ログインをお試しください。
+            ```
+            - 初回登録・OTP上限入力後
+            ```
+            ワンタイムパスワード入力制限に達しました。
+
+            このメールアドレスでのアカウント登録は48時間できません。
+
+            48時間経過後に再度ご登録お願いします。
+            ```
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            loginMaxRequest:
+              value:
+                code: "MAX_REQUEST"
+                message: "現在アカウントがロックされています。\n○○時○○分以降に再度ログインをお試しください。"
+            firstLoginMaxRequest:
+              value:
+                code: "MAX_REQUEST"
+                message: "ワンタイムパスワード入力制限に達しました。\n\nこのメールアドレスでのアカウント登録は48時間できません。\n\n48時間経過後に再度ご登録お願いします。"
+    InternalServerError:
+      description: サーバエラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            InternalServerError:
+              value:
+                code: "INTERNAL_SERVER_ERROR"
+                message: "現在、サーバーエラーが発生しています。\nお手数ですが、一定時間経過後に再度ログインをお願いします。"
