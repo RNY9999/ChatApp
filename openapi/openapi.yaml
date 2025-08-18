@@ -41,12 +41,7 @@ paths:
           description: 有効なセッション
           headers:
             Cache-Control:
-              description: |
-                ブラウザにキャッシュさせるかどうか。
-                基本は `no-store`
-              schema:
-                type: string
-                example: no-store
+              $ref: '#/components/headers/NoStore'
           content:
             application/json:
               schema:
@@ -70,14 +65,6 @@ paths:
                       email: "first-login@example.com"
         '401':
           description: 無効（未ログイン / 期限切れ / リボーク済み）
-          headers:
-            Cache-Control:
-              description: |
-                ブラウザにキャッシュさせるかどうか。
-                基本は `no-store`
-              schema:
-                type: string
-                example: no-store
           $ref: '#/components/responses/InvalidSession'
         '500':
           $ref: '#/components/responses/InternalServerError'
@@ -116,6 +103,8 @@ paths:
                 - 開発環境では Secure 省略の可能性あり
               schema:
                 type: string
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
           content:
             application/json:
               schema:
@@ -139,6 +128,8 @@ paths:
                 - 開発環境では Secure 省略の可能性あり
               schema:
                 type: string
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
           content:
             application/json:
               schema:
@@ -245,9 +236,18 @@ components:
           example: error message
         nextPath:
           $ref: '#/components/schemas/NextPath'
+  headers:
+    NoStore:
+      description: ブラウザ / プロキシにキャッシュさせない
+      schema:
+        type: string
+        example: no-store
   responses:
     BadRequest:
       description: バリデーションエラー等不正なリクエスト
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
       content:
         application/json:
           schema:
@@ -259,6 +259,9 @@ components:
                 message: "不正な入力値です。" 
     Unauthorized:
       description: 認証失敗
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
       content:
         application/json:
           schema:
@@ -271,6 +274,9 @@ components:
                 message: "ID（メールアドレス）またはパスワードが異なります。"
     InvalidSession:
       description: セッションが無効（未ログイン / 期限切れ / リボーク済み）
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
       content:
         application/json:
           schema:
@@ -298,6 +304,9 @@ components:
 
             48時間経過後に再度ご登録お願いします。
             ```
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
       content:
         application/json:
           schema:
@@ -313,6 +322,9 @@ components:
                 message: "ワンタイムパスワード入力制限に達しました。\n\nこのメールアドレスでのアカウント登録は48時間できません。\n\n48時間経過後に再度ご登録お願いします。"
     InternalServerError:
       description: サーバエラー
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
       content:
         application/json:
           schema:
