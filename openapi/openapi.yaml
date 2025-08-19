@@ -146,7 +146,41 @@ paths:
           $ref: '#/components/responses/MaxRequest'
         '500':
           $ref: '#/components/responses/InternalServerError'
-
+  /api/admin/session/refresh:
+    post:
+      tags:
+        - Admin Session
+      summary: セッション延長（スライディング）
+      security:
+        - CookieAuth: []
+        - CsrfToken: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfTokenHeader'
+      responses:
+        '200':
+          description: セッション延長
+          headers:
+            Set-Cookie:
+              description: 延長時のみ新しい ln_admin_sid を返す
+              schema:
+                type: string
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - refreshed
+                  - expiresAt
+                properties:
+                  refreshed:
+                    type: boolean
+                    example: true
+                  expiresAt:
+                    type: string
+                    format: date-time
+                    example: "2025-08-19T10:00:00Z"
 components:
   securitySchemes:
     CookieAuth:
@@ -154,6 +188,11 @@ components:
       in: cookie
       name: ln_admin_sid
       description: HttpOnly クッキーに保持する管理者セッションID
+    CsrfToken:
+      type: apiKey
+      in: header
+      name: X-CSRF-Token
+      description: CSRF対策用のワンタイムパスワード
   schemas:
     SessionStatus:
       type: object
@@ -235,6 +274,15 @@ components:
           example: error message
         nextPath:
           $ref: '#/components/schemas/NextPath'
+  parameters:
+    CsrfTokenHeader:
+      name: X-CSRF-Token
+      in: header
+      required: true
+      description: Double Submit Cookie方式。`ln_csrf` の値をヘッダにつける。
+      schema:
+        type: string
+        minLength: 16
   headers:
     NoStore:
       description: ブラウザ / プロキシにキャッシュさせない
@@ -256,8 +304,8 @@ components:
               value:
                 code: "BAD_REQUEST"
                 message: "不正な入力値です。" 
-    Unauthorized:
-      description: 認証失敗
+    CsrfForbidden:
+      description: CSRFトークン検証エラー（403共通レスポンス）
       headers:
         Cache-Control:
           $ref: '#/components/headers/NoStore'
@@ -266,11 +314,25 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
           examples:
-            unauthorized:
-              summary: 認証失敗
+            csrfForbidden:
+              summary: CSRFトークン検証エラー
               value:
-                code: "UNAUTHORIZED"
-                message: "ID（メールアドレス）またはパスワードが異なります。"
+                code: "CSRF_FORBIDDEN"
+                message: "CSRFトークンが無効です。"
+    InternalServerError:
+      description: サーバエラー
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            InternalServerError:
+              value:
+                code: "INTERNAL_SERVER_ERROR"
+                message: "現在、サーバーエラーが発生しています。\nお手数ですが、一定時間経過後に再度ログインをお願いします。"
     InvalidSession:
       description: セッションが無効（未ログイン / 期限切れ / リボーク済み）
       headers:
@@ -319,8 +381,8 @@ components:
               value:
                 code: "MAX_REQUEST"
                 message: "ワンタイムパスワード入力制限に達しました。\n\nこのメールアドレスでのアカウント登録は48時間できません。\n\n48時間経過後に再度ご登録お願いします。"
-    InternalServerError:
-      description: サーバエラー
+    Unauthorized:
+      description: 認証失敗
       headers:
         Cache-Control:
           $ref: '#/components/headers/NoStore'
@@ -329,7 +391,8 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
           examples:
-            InternalServerError:
+            unauthorized:
+              summary: 認証失敗
               value:
-                code: "INTERNAL_SERVER_ERROR"
-                message: "現在、サーバーエラーが発生しています。\nお手数ですが、一定時間経過後に再度ログインをお願いします。"
+                code: "UNAUTHORIZED"
+                message: "ID（メールアドレス）またはパスワードが異なります。"
