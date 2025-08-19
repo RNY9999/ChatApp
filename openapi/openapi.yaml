@@ -32,8 +32,8 @@ paths:
       summary: 管理者ログインチェック
       operationId: adminLoginCheck
       description: |
-        Cookie`ln_admin_sid`を検証し、セッションの有効性と権限レベルを返す。
-        このエンドポイントでは原則 Set-Cookie を返さない
+        Cookie `ln_admin_sid` を検証し、セッションの有効性（valid）を返す。
+        このエンドポイントでは原則 Set-Cookie を返さない。
       security:
         - CookieAuth: []
       responses:
@@ -64,7 +64,6 @@ paths:
                       id: 3
                       email: "first-login@example.com"
         '401':
-          description: 無効（未ログイン / 期限切れ / リボーク済み）
           $ref: '#/components/responses/InvalidSession'
         '500':
           $ref: '#/components/responses/InternalServerError'
