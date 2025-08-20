@@ -97,11 +97,9 @@ paths:
           description: ログイン成功・セッション確立
           headers:
             Set-Cookie:
-              description: |
-                セッションクッキー（例: `ln_admin_sid={token}; Path=/; HttpOnly; Secure; SameSite=Lax;`）
-                - 開発環境では Secure 省略の可能性あり
-              schema:
-                type: string
+              $ref: '#/components/headers/AdminSessionCookie'
+            Set-Cookie-CSRF:
+              $ref: '#/components/headers/CsrfCookie'
             Cache-Control:
               $ref: '#/components/headers/NoStore'
           content:
@@ -122,11 +120,9 @@ paths:
             ※初回ログイン完了時はセッションをローテーション（Session Fixation対策）。
           headers:
             Set-Cookie:
-              description: |
-                セッションクッキー（例: `ln_admin_sid={token}; Path=/; HttpOnly; Secure; SameSite=Lax;`）
-                - 開発環境では Secure 省略の可能性あり
-              schema:
-                type: string
+              $ref: '#/components/headers/AdminSessionCookie'
+            Set-Cookie-CSRF:
+              $ref: '#/components/headers/CsrfCookie'
             Cache-Control:
               $ref: '#/components/headers/NoStore'
           content:
@@ -158,12 +154,12 @@ paths:
         - $ref: '#/components/parameters/CsrfTokenHeader'
       responses:
         '200':
-          description: セッション延長
+          description: セッション延長（延長が不要でも CSRF は毎回ローテーション）
           headers:
             Set-Cookie:
-              description: 延長時のみ新しい ln_admin_sid を返す
-              schema:
-                type: string
+              $ref: '#/components/headers/AdminSessionCookie' # 必要時のみ新規で発行
+            Set-Cookie-CSRF:
+              $ref: '#/components/headers/CsrfCookie' # 常に新規で発行
             Cache-Control:
               $ref: '#/components/headers/NoStore'
           content:
@@ -282,13 +278,38 @@ components:
       description: Double Submit Cookie方式。`ln_csrf` の値をヘッダにつける。
       schema:
         type: string
-        minLength: 16
+        minLength: 32
+        pattern: '^[A-Za-z0-9\-_]{32,}$'   # base64url 等を想定
   headers:
     NoStore:
       description: ブラウザ / プロキシにキャッシュさせない
       schema:
         type: string
         example: no-store
+    # 以下Cookieに関するheader
+    # Set-Cookie は複数行返る可能性あり（本ヘッダは代表記述）
+    AdminSessionCookie:
+      description: |
+        セッションID Cookie
+        ▼example
+        `ln_admin_sid={session}; Path=/; HttpOnly; Secure; SameSite=<see note>; Max-Age=1800`
+        - HttpOnly: true
+        - Secure: true
+        - Path: /
+        - SameSite: 環境により選択（後述）
+      schema:
+        type: string
+    CsrfCookie:
+      description: |
+        ダブルサブミット用 CSRF Cookie
+        ▼example
+        `ln_csrf={token}; Path/; HttpOnly; Secure; SameSite=<see note>; Max-Age=1800`
+        - HttpOnly: true
+        - Secure: true
+        - Path: /
+        - SameSite: 環境により選択（後述）
+      schema:
+        type: string
   responses:
     BadRequest:
       description: バリデーションエラー等不正なリクエスト
