@@ -142,19 +142,53 @@ paths:
           $ref: '#/components/responses/MaxRequest'
         '500':
           $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Admin Session
+      summary: ログアウト
+      description: |
+        サーバ側のセッションを無効化し、Cookieを削除する。
+        成功時は204(No Content)を返し、クライアントをログイン画面へ誘導する。
+      security:
+        - CookieAuth: []
+        - CsrfTokenInHeader: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfTokenHeader'
+      responses:
+        '204':
+          description: ログアウト成功
+          headers:
+            Set-Cookie:
+              description: セッションCookie削除
+              schema:
+                type: string
+                example: "ln_admin_sid=; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=0"
+            Set-Cookie-CSRF:
+              description: CSRF Cookie削除
+              schema:
+                type: string
+                example: "ln_csrf=; Path=/; Secure; SameSite=None; Max-Age=0"
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+        '400':
+          $ref: '#/components/responses/CsrfMissing'
+        '403':
+          $ref: '#/components/responses/CsrfForbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/admin/session/refresh:
     post:
       tags:
         - Admin Session
-      summary: セッション延長（スライディング）
+      summary: セッション延長（スライディング） / CSRFのローテーション
       security:
         - CookieAuth: []
-        - CsrfToken: []
+        - CsrfTokenInHeader: []
       parameters:
         - $ref: '#/components/parameters/CsrfTokenHeader'
       responses:
         '200':
-          description: セッション延長（延長が不要でも CSRF は毎回ローテーション）
+          description: セッション延長（延長が不要でも CSRF は毎回ローテーション）<br>※2xxの場合のみln_csrf を新規発行し、それ以外の場合は発行しない。
           headers:
             Set-Cookie:
               $ref: '#/components/headers/AdminSessionCookie' # 必要時のみ新規で発行
@@ -177,8 +211,35 @@ paths:
                     type: string
                     format: date-time
                     example: "2025-08-19T10:00:00Z"
-        ''
-
+        '400':
+          $ref: '#/components/responses/CsrfMissing'
+        '403':
+          $ref: '#/components/responses/CsrfForbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/admin/csrf:
+    get:
+      tags:
+        - Admin Session
+      summary: CSRFトークン再発行
+      description: |
+        有効なセッション（ln_admin_sid）がある場合、CSRFトークン（ln_csrf）を再発行する。
+        成功時は本文なし（204 No Content）。
+        UI側は10分毎に自動でリクエストを送信し、CSRFトークンを新しくする。
+      security:
+        - CookieAuth: []
+      responses:
+        '204':
+          description: 成功時に新しい CSRF Cookie を返す。
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/CsrfCookie'
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+        '401':
+          $ref: '#/components/responses/InvalidSession'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   securitySchemes:
     CookieAuth:
@@ -186,11 +247,16 @@ components:
       in: cookie
       name: ln_admin_sid
       description: HttpOnly クッキーに保持する管理者セッションID
-    CsrfToken:
+    CsrfTokenInCookie:
+      type: apiKey
+      in: cookie
+      name: ln_csrf
+      description: Double Submit Cookie 方式の CSRF トークン（-CSRF-Token と同値）
+    CsrfTokenInHeader:
       type: apiKey
       in: header
       name: X-CSRF-Token
-      description: CSRF対策用のワンタイムパスワード
+      description: Double Submit Cookie 方式の CSRF トークン（Cookie ln_csrf と同値）
   schemas:
     SessionStatus:
       type: object
@@ -296,20 +362,22 @@ components:
         ▼example
         `ln_admin_sid={session}; Path=/; HttpOnly; Secure; SameSite=<see note>; Max-Age=1800`
         - HttpOnly: true
-        - Secure: true
+        - Secure: true（開発環境はfalse, 開発環境もHTTPS適用後にtrue運用）
         - Path: /
-        - SameSite: 環境により選択（後述）
+        - SameSite: None
+        ※ドメインを同一にする場合はLaxに変更
       schema:
         type: string
     CsrfCookie:
       description: |
         ダブルサブミット用 CSRF Cookie
         ▼example
-        `ln_csrf={token}; Path/; HttpOnly; Secure; SameSite=<see note>; Max-Age=1800`
-        - HttpOnly: true
-        - Secure: true
+        `ln_csrf={token}; Path=/; HttpOnly; Secure; SameSite=<see note>; Max-Age=900`
+        - HttpOnly: false
+        - Secure: true（開発環境はfalse, 開発環境もHTTPS適用後にtrue運用）
         - Path: /
-        - SameSite: 環境により選択（後述）
+        - SameSite: None
+        ※ドメインを同一にする場合はLaxに変更
       schema:
         type: string
   responses:
@@ -327,8 +395,8 @@ components:
               value:
                 code: "BAD_REQUEST"
                 message: "不正な入力値です。" 
-    CsrfMissingHeader:
-      description: CSRFヘッダ未送信（400error）
+    CsrfMissing:
+      description: CSRF ヘッダ / Cookie 未送信 # 400error
       headers:
         Cache-Control:
           $ref: '#/components/headers/NoStore'
@@ -338,11 +406,17 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
           examples:
             csrfMissingHeader:
+              summary: CSRF ヘッダ未送信
               value:
                 code: "CSRF_MISSING_HEADER"
                 message: "X-CSRF-Token required"
+            csrfMissingCookie:
+              summary: CSRF Cookie 未送信
+              value:
+                code: "CSRF_MISSING_COOKIE"
+                message: "ln_csrf Cookie required"
     CsrfForbidden:
-      description: CSRFトークン検証エラー（403共通レスポンス）
+      description: CSRFトークン検証エラー / 値不一致時・または有効期限切れ # 403 error
       headers:
         Cache-Control:
           $ref: '#/components/headers/NoStore'
@@ -366,7 +440,18 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
           examples:
+            CsrfIssuanceFailed:
+              summary: CSRF発行失敗
+              value:
+                code: "CSRF_ISSUANCE_FAILED"
+                message: "Cannot issue CSRF"
+            SidIssuanceFailed:
+              summary: session id 発行失敗
+              value:
+                code: "LN_ADMIN_SID_ISSUANCE_FAILED"
+                message: "Cannot issue ln_admin_sid"
             InternalServerError:
+              summary: サーバーエラー（原因不明）
               value:
                 code: "INTERNAL_SERVER_ERROR"
                 message: "現在、サーバーエラーが発生しています。\nお手数ですが、一定時間経過後に再度ログインをお願いします。"
