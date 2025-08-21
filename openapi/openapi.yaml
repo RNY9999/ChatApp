@@ -177,6 +177,8 @@ paths:
                     type: string
                     format: date-time
                     example: "2025-08-19T10:00:00Z"
+        ''
+
 components:
   securitySchemes:
     CookieAuth:
@@ -325,6 +327,20 @@ components:
               value:
                 code: "BAD_REQUEST"
                 message: "不正な入力値です。" 
+    CsrfMissingHeader:
+      description: CSRFヘッダ未送信（400error）
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            csrfMissingHeader:
+              value:
+                code: "CSRF_MISSING_HEADER"
+                message: "X-CSRF-Token required"
     CsrfForbidden:
       description: CSRFトークン検証エラー（403共通レスポンス）
       headers:
