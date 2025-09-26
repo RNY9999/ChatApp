@@ -1,0 +1,232 @@
+openapi: '3.1.0'
+info:
+  title: Linknest 管理システムAPI
+  description: Linknest管理システムで使用するAPI一覧・API仕様書
+  version: '1.0.0'
+
+servers:
+  - url: http://localhost:5000
+    description: 開発環境URL
+
+tags:
+  - name: Admin Session
+    description: 管理者セッション（ログイン/ログアウト/セッション確認）
+  - name: Admin Login Log
+    description: 管理者ログインログ
+
+paths:
+  /api/admin/session:
+    post:
+      summary: 管理者ログイン
+      description: |
+        認証に成功するとサーバ側でセッションを作成し、`HttpOnly` クッキーとして返却します。
+        OTP必須のユーザーは 202 で応答し、OTP入力画面へ誘導します。
+      operationId: adminLogin
+      tags: [Admin Session]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              normal:
+                value: { email: "linknest@example.com", password: "P@ssw0rd!" }
+      responses:
+        '200':
+          description: ログイン成功。セッション確立。
+          headers:
+            Set-Cookie:
+              description: |
+                セッションクッキー（例: `admin_sid={token}; Path=/; HttpOnly; Secure; SameSite=Lax`）
+                - 開発環境では Secure 省略の可能性あり
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginSuccess'
+              examples:
+                ok:
+                  value:
+                    admin:
+                      id: 1
+                      email: "linknest@example.com"
+                      role: "owner"
+                    session:
+                      id: "sess_abc123"
+                      issuedAt: "2025-08-15T09:00:00Z"
+                      expiresAt: "2025-08-15T11:00:00Z"
+        '202':
+          description: OTPが必要（初回ログイン/2FA）。セッション未確立。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OtpRequired'
+              examples:
+                needOtp:
+                  value:
+                    needOtp: true
+                    otpDelivery: "email"
+                    otpToken: "otp_tx_9f8a" # 検証APIに渡す一時トークン（例）
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '423':
+          description: アカウントロック
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              examples:
+                locked:
+                  value: { code: "ACCOUNT_LOCKED", message: "アカウントがロックされています。" }
+        '429':
+          description: 試行回数超過（レート制限）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              examples:
+                tooMany:
+                  value: { code: "TOO_MANY_ATTEMPTS", message: "短時間に試行が多すぎます。" }
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/admin/login-log:
+    post:
+      summary: 管理者ログインログ保存
+      description: ログイン試行の監査ログを保存します（成功/失敗を問わず）。
+      operationId: adminLoginLog
+      tags: [Admin Login Log]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginLogRequest'
+            examples:
+              ok:
+                value:
+                  email: "linknest@example.com"
+                  result: "SUCCESS"
+                  ip: "203.0.113.10"
+                  userAgent: "Mozilla/5.0 ..."
+      responses:
+        '201':
+          description: 保存成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: integer, example: 12345 }
+                  createdAt: { type: string, format: date-time, example: "2025-08-15T09:00:00Z" }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: admin_sid
+      description: |
+        管理者セッションIDを保持する `HttpOnly` クッキー。
+        推奨: `SameSite=Lax` または `Strict`、本番は `Secure` 付与。
+
+  schemas:
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: linknest@example.com
+        password:
+          type: string
+          format: password
+          minLength: 12
+    LoginSuccess:
+      type: object
+      properties:
+        admin:
+          $ref: '#/components/schemas/AdminPublic'
+        session:
+          type: object
+          properties:
+            id: { type: string, example: "sess_abc123" }
+            issuedAt: { type: string, format: date-time }
+            expiresAt: { type: string, format: date-time }
+    OtpRequired:
+      type: object
+      required: [needOtp]
+      properties:
+        needOtp: { type: boolean, example: true }
+        otpDelivery:
+          type: string
+          enum: [email, sms]
+          description: OTP送信チャネル
+        otpToken:
+          type: string
+          description: OTP検証APIに引き渡す一時トークン
+    AdminPublic:
+      type: object
+      properties:
+        id: { type: integer, example: 1 }
+        email: { type: string, format: email, example: "linknest@example.com" }
+        role: { type: string, example: "owner" }
+    LoginLogRequest:
+      type: object
+      required: [email, result]
+      properties:
+        email: { type: string, format: email }
+        result:
+          type: string
+          enum: [SUCCESS, FAILURE]
+        reason:
+          type: string
+          description: 失敗時の理由（例：BAD_PASSWORD, ACCOUNT_LOCKED）
+        ip: { type: string, example: "203.0.113.10" }
+        userAgent: { type: string, example: "Mozilla/5.0 ..." }
+        occurredAt:
+          type: string
+          format: date-time
+          description: クライアント観測の発生時刻（未指定ならサーバ時刻）
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string, example: "UNAUTHORIZED" }
+        message: { type: string, example: "認証に失敗しました。" }
+        details:
+          type: object
+          additionalProperties: true
+
+  responses:
+    BadRequest:
+      description: バリデーションエラーなど不正なリクエスト
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          examples:
+            badRequest:
+              value: { code: "BAD_REQUEST", message: "必須項目が不足しています。" }
+    Unauthorized:
+      description: 認証失敗
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          examples:
+            unauthorized:
+              value: { code: "UNAUTHORIZED", message: "メールアドレスまたはパスワードが不正です。" }
+    InternalServerError:
+      description: サーバエラー
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          examples:
+            ise:
+              value: { code: "INTERNAL_SERVER_ERROR", message: "サーバエラーが発生しました。" }
